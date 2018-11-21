@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
 import { EditorState } from "prosemirror-state"
 import { EditorView } from "prosemirror-view"
 import { Schema, DOMParser } from "prosemirror-model"
@@ -17,13 +17,7 @@ export class NgxProsemirrorComponent implements OnInit {
   @ViewChild("editor", { read: ElementRef }) editor: ElementRef;
 
   @Input() content: string;
-  public markdown: string = `
-  # This is just a test
-  ## This is a subtitle
-  This is normal content
-  * this is a bullet point
-  * another bullet point
-  `;
+  @Output() contentChange = new EventEmitter();
 
   constructor() { }
 
@@ -44,7 +38,8 @@ export class NgxProsemirrorComponent implements OnInit {
       dispatchTransaction: transaction => {
         let newState = view.state.apply(transaction)
         view.updateState(newState);
-        this.markdown = defaultMarkdownSerializer.serialize(view.state.doc);
+        this.content = defaultMarkdownSerializer.serialize(view.state.doc);
+        this.contentChange.emit(this.content);
       }
     });
   }
